@@ -1,0 +1,437 @@
+
+Overview
+You must complete a series of tasks within the allocated time period. Instead of following step-by-step instructions, you'll be given a scenario and a set of tasks - you figure out how to complete it on your own! An automated scoring system (shown on this page) will provide feedback on whether you have completed your tasks correctly.
+
+To score 100% you must complete all tasks within the time period!
+
+When you take a Challenge Lab, you will not be taught Google Cloud concepts. To build the solution to the challenge presented, use skills learned from the labs in the quest this challenge lab is part of. You will be expected to extend your learned skills; you will be expected to change broken queries.
+
+This lab is only recommended for students who have completed the labs in the Insights from Data with BigQuery Quest and understand the basics of SQL and BigQuery.
+
+Please make sure you review the labs in the Insights from Data with BigQuery Quest before starting this lab!
+
+Are you up for the challenge? Let's go!
+
+Scenario
+You're part of a public health organization which is tasked with identifying answers to queries related to the Covid-19 pandemic. Obtaining the right answers will help the organization in planning and focusing healthcare efforts and awareness programs appropriately.
+
+The dataset and table that will be used for this analysis will be : bigquery-public-data.covid19_open_data.covid19_open_data. This repository contains country-level datasets of daily time-series data related to COVID-19 globally. It includes data relating to demographics, economy, epidemiology, geography, health, hospitalizations, mobility, government response, and weather.
+
+Setup and Requirements
+Before you click the Start Lab button
+Read these instructions. Labs are timed and you cannot pause them. The timer, which starts when you click Start Lab, shows how long Google Cloud resources will be made available to you.
+
+This Qwiklabs hands-on lab lets you do the lab activities yourself in a real cloud environment, not in a simulation or demo environment. It does so by giving you new, temporary credentials that you use to sign in and access Google Cloud for the duration of the lab.
+
+What you need
+To complete this lab, you need:
+
+Access to a standard internet browser (Chrome browser recommended).
+Time to complete the lab.
+Note: If you already have your own personal Google Cloud account or project, do not use it for this lab.
+
+Note: If you are using a Pixelbook, open an Incognito window to run this lab.
+
+How to start your lab and sign in to the Google Cloud Console
+Click the Start Lab button. If you need to pay for the lab, a pop-up opens for you to select your payment method. On the left is a panel populated with the temporary credentials that you must use for this lab.
+
+Open Google Console
+
+Copy the username, and then click Open Google Console. The lab spins up resources, and then opens another tab that shows the Sign in page.
+
+Sign in
+
+Tip: Open the tabs in separate windows, side-by-side.
+
+If you see the Choose an account page, click Use Another Account. Choose an account
+In the Sign in page, paste the username that you copied from the Connection Details panel. Then copy and paste the password.
+
+Important: You must use the credentials from the Connection Details panel. Do not use your Qwiklabs credentials. If you have your own Google Cloud account, do not use it for this lab (avoids incurring charges).
+
+Click through the subsequent pages:
+
+Accept the terms and conditions.
+Do not add recovery options or two-factor authentication (because this is a temporary account).
+Do not sign up for free trials.
+After a few moments, the Cloud Console opens in this tab.
+
+Note: You can view the menu with a list of Google Cloud Products and Services by clicking the Navigation menu at the top-left. Cloud Console Menu
+Activate Cloud Shell
+Cloud Shell is a virtual machine that is loaded with development tools. It offers a persistent 5GB home directory and runs on the Google Cloud. Cloud Shell provides command-line access to your Google Cloud resources.
+
+In the Cloud Console, in the top right toolbar, click the Activate Cloud Shell button.
+
+Cloud Shell icon
+
+Click Continue.
+
+cloudshell_continue.png
+
+It takes a few moments to provision and connect to the environment. When you are connected, you are already authenticated, and the project is set to your PROJECT_ID. For example:
+
+Cloud Shell Terminal
+
+gcloud is the command-line tool for Google Cloud. It comes pre-installed on Cloud Shell and supports tab-completion.
+
+You can list the active account name with this command:
+
+gcloud auth list
+(Output)
+
+Credentialed accounts:
+ - <myaccount>@<mydomain>.com (active)
+(Example output)
+
+Credentialed accounts:
+ - google1623327_student@qwiklabs.net
+You can list the project ID with this command:
+
+gcloud config list project
+(Output)
+
+[core]
+project = <project_ID>
+(Example output)
+
+[core]
+project = qwiklabs-gcp-44776a13dea667a6
+For full documentation of gcloud see the gcloud command-line tool overview.
+Query 1: Total Confirmed Cases
+Build a query that will answer "What was the total count of confirmed cases on Apr 15, 2020?" The query needs to return a single row containing the sum of confirmed cases across all countries. The name of the column should be total_cases_worldwide.
+
+Click Check my progress to verify the objective.
+Total Confirmed Cases
+
+Query 2: Worst Affected Areas
+Build a query for answering "How many states in the US had more than 100 deaths on Apr 10, 2020?" The query needs to list the output in the field count_of_states. Hint: Don't include NULL values.
+
+Click Check my progress to verify the objective.
+Worst Affected Areas
+
+Query 3: Identifying Hotspots
+Build a query that will answer "List all the states in the United States of America that had more than 1000 confirmed cases on Apr 10, 2020?" The query needs to return the State Name and the corresponding confirmed cases arranged in descending order. Name of the fields to return state and total_confirmed_cases.
+
+Click Check my progress to verify the objective.
+Identifying Hotspots
+
+Query 4: Fatality Ratio
+Build a query that will answer "What was the case-fatality ratio in Italy for the month of April 2020?" Case-fatality ratio here is defined as (total deaths / total confirmed cases) * 100. Write a query to return the ratio for the month of April 2020 and containing the following fields in the output: total_confirmed_cases, total_deaths, case_fatality_ratio.
+
+Click Check my progress to verify the objective.
+Fatality Ratio
+
+Query 5: Identifying specific day
+Build a query that will answer: "On what day did the total number of deaths cross 10000 in Italy?" The query should return the date in the format yyyy-mm-dd.
+
+Click Check my progress to verify the objective.
+Identifying Hotspots
+
+Query 6: Finding days with zero net new cases
+The following query is written to identify the number of days in India between 21 Feb 2020 and 15 March 2020 when there were zero increases in the number of confirmed cases. However it is not executing properly. You need to update the query to complete it and obtain the result:
+
+WITH india_cases_by_date AS (
+  SELECT
+    date,
+    SUM(cumulative_confirmed) AS cases
+  FROM
+    `bigquery-public-data.covid19_open_data.covid19_open_data`
+  WHERE
+    country_name="India"
+    AND date between '2020-02-21' and '2020-03-15'
+  GROUP BY
+    date
+  ORDER BY
+    date ASC
+ )
+
+, india_previous_day_comparison AS
+(SELECT
+  date,
+  cases,
+  LAG(cases) OVER(ORDER BY date) AS previous_day,
+  cases - LAG(cases) OVER(ORDER BY date) AS net_new_cases
+FROM india_cases_by_date
+)
+
+Click Check my progress to verify the objective.
+Finding days with zero net new cases
+
+Query 7: Doubling rate
+Using the previous query as a template, write a query to find out the dates on which the confirmed cases increased by more than 10% compared to the previous day (indicating doubling rate of ~ 7 days) in the US between the dates March 22, 2020 and April 20, 2020. The query needs to return the list of dates, the confirmed cases on that day, the confirmed cases the previous day, and the percentage increase in cases between the days. Use the following names for the returned fields: Date, Confirmed_Cases_On_Day, Confirmed_Cases_Previous_Day and Percentage_Increase_In_Cases.
+
+Click Check my progress to verify the objective.
+Doubling rate
+
+Query 8: Recovery rate
+Build a query to list the recovery rates of countries arranged in descending order (limit to 10) on the date May 10, 2020. Restrict the query to only those countries having more than 50K confirmed cases. The query needs to return the following fields: country, recovered_cases, confirmed_cases, recovery_rate.
+
+Click Check my progress to verify the objective.
+Recovery rate
+
+Query 9: CDGR - Cumulative Daily Growth Rate
+The following query is trying to calculate the CDGR on May 10, 2020(Cumulative Daily Growth Rate) for France since the day the first case was reported. The first case was reported on Jan 24, 2020. The CDGR is calculated as:
+
+((last_day_cases/first_day_cases)^1/days_diff)-1)
+
+Where :
+
+last_day_cases is the number of confirmed cases on May 10, 2020
+first_day_cases is the number of confirmed cases on Feb 02, 2020
+days_diff is the number of days between Feb 02 - May 10, 2020
+The query isn’t executing properly. Can you fix the error to make the query execute successfully?
+
+WITH
+  france_cases AS (
+  SELECT
+    date,
+    SUM(cumulative_confirmed) AS total_cases
+  FROM
+    `bigquery-public-data.covid19_open_data.covid19_open_data`
+  WHERE
+    country_name="France"
+    AND date IN ('2020-01-24',
+      '2020-05-10')
+  GROUP BY
+    date
+  ORDER BY
+    date)
+, summary as (
+SELECT
+  total_cases AS first_day_cases,
+  LEAD(total_cases) AS last_day_cases,
+  DATE_DIFF(LEAD(date) OVER(ORDER BY date),date, day) AS days_diff
+FROM
+  france_cases
+LIMIT 1
+)
+
+select first_day_cases, last_day_cases, days_diff, SQRT((last_day_cases/first_day_cases),(1/days_diff))-1 as cdgr
+from summary
+Note: Refer to the following page to learn more about the SQL function referenced LEAD().
+
+Click Check my progress to verify the objective.
+CDGR - Cumulative Daily Growth Rate
+
+Create a Datastudio report
+Create a Datastudio report that plots the following for the United States:
+
+Number of Confirmed Cases
+Number of Deaths
+Date range : 2020-03-15 to 2020-04-30
+Click Check my progress to verify the objective.
+Create a Datastudio report
+
+Hint: Use the below image as a reference while building the report and make sure your report matches it.
+
+screenshot
+
+Congratulations!
+
+
+--------------------------------------
+
+1
+
+SELECT sum(cumulative_confirmed) as total_cases_worldwide FROM `bigquery-public-data.covid19_open_data.covid19_open_data` where date='2020-04-15'
+
+2
+
+with deaths_by_states as (
+SELECT subregion1_name as state, sum(cumulative_deceased) as death_count
+FROM `bigquery-public-data.covid19_open_data.covid19_open_data` 
+where country_name="United States of America" and date='2020-04-10' and subregion1_name is NOT NULL
+group by subregion1_name
+)
+
+select count(*) as count_of_states
+from deaths_by_states
+where death_count > 100
+
+3
+
+SELECT subregion1_name as state, sum(cumulative_confirmed) as total_confirmed_cases 
+FROM `bigquery-public-data.covid19_open_data.covid19_open_data` 
+where country_name="United States of America" and date='2020-04-10' and subregion1_name is NOT NULL
+group by subregion1_name
+having total_confirmed_cases > 1000
+order by total_confirmed_cases desc
+
+
+
+4
+
+select sum(cumulative_confirmed) as total_confirmed_cases, sum(cumulative_deceased) as total_deaths, (sum(cumulative_deceased)/sum(cumulative_confirmed))*100 as case_fatality_ratio
+from `bigquery-public-data.covid19_open_data.covid19_open_data`
+where country_name="Italy" and date BETWEEN "2020-04-01" AND "2020-04-30"
+
+
+5
+
+SELECT date
+FROM `bigquery-public-data.covid19_open_data.covid19_open_data` 
+where country_name="Italy" and cumulative_deceased>10000
+order by date asc
+limit 1
+
+
+6
+
+WITH india_cases_by_date AS (
+  SELECT
+    date,
+    SUM( cumulative_confirmed ) AS cases
+  FROM
+    `bigquery-public-data.covid19_open_data.covid19_open_data`
+  WHERE
+    country_name ="India"
+    AND date between '2020-02-21' and '2020-03-15'
+  GROUP BY
+    date
+  ORDER BY
+    date ASC 
+ )
+, india_previous_day_comparison AS 
+(SELECT
+  date,
+  cases,
+  LAG(cases) OVER(ORDER BY date) AS previous_day,
+  cases - LAG(cases) OVER(ORDER BY date) AS net_new_cases
+FROM india_cases_by_date
+)
+select count(*)
+from india_previous_day_comparison
+where net_new_cases=0
+
+
+7
+
+WITH us_cases_by_date AS (
+  SELECT
+    date,
+    SUM(cumulative_confirmed) AS cases
+  FROM
+    `bigquery-public-data.covid19_open_data.covid19_open_data`
+  WHERE
+    country_name="United States of America"
+    AND date between '2020-03-22' and '2020-04-20'
+  GROUP BY
+    date
+  ORDER BY
+    date ASC 
+ )
+, us_previous_day_comparison AS 
+(SELECT
+  date,
+  cases,
+  LAG(cases) OVER(ORDER BY date) AS previous_day,
+  cases - LAG(cases) OVER(ORDER BY date) AS net_new_cases,
+  (cases - LAG(cases) OVER(ORDER BY date))*100/LAG(cases) OVER(ORDER BY date) AS percentage_increase
+FROM us_cases_by_date
+)
+select Date, cases as Confirmed_Cases_On_Day, previous_day as Confirmed_Cases_Previous_Day, percentage_increase as Percentage_Increase_In_Cases
+from us_previous_day_comparison
+where percentage_increase > 10
+
+
+
+8
+
+WITH cases_by_country AS (
+  SELECT
+    country_name AS country,
+    sum(cumulative_confirmed) AS cases,
+    sum(cumulative_recovered) AS recovered_cases
+  FROM
+    bigquery-public-data.covid19_open_data.covid19_open_data
+  WHERE
+    date = '2020-05-10'
+  GROUP BY
+    country_name
+ )
+, recovered_rate AS 
+(SELECT
+  country, cases, recovered_cases,
+  (recovered_cases * 100)/cases AS recovery_rate
+FROM cases_by_country
+)
+SELECT country, cases AS confirmed_cases, recovered_cases, recovery_rate
+FROM recovered_rate
+WHERE cases > 50000
+ORDER BY recovery_rate desc
+LIMIT 10
+
+
+
+9
+
+WITH
+  france_cases AS (
+  SELECT
+    date,
+    SUM(cumulative_confirmed) AS total_cases
+  FROM
+    `bigquery-public-data.covid19_open_data.covid19_open_data`
+  WHERE
+    country_name="France"
+    AND date IN ('2020-01-24',
+      '2020-05-10')
+  GROUP BY
+    date
+  ORDER BY
+    date)
+, summary as (
+SELECT
+  total_cases AS first_day_cases,
+  LEAD(total_cases) OVER(ORDER BY date) AS last_day_cases,
+  DATE_DIFF(LEAD(date) OVER(ORDER BY date),date, day) AS days_diff
+FROM
+  france_cases
+LIMIT 1
+)
+select first_day_cases, last_day_cases, days_diff, POW((last_day_cases/first_day_cases),(1/days_diff))-1 as cdgr
+from summary
+
+
+
+10
+
+SELECT
+  date, SUM(cumulative_confirmed) AS country_cases,
+  SUM(cumulative_deceased) AS country_deaths
+FROM
+  `bigquery-public-data.covid19_open_data.covid19_open_data`
+WHERE
+  date BETWEEN '2020-03-15'
+  AND '2020-04-30'
+  AND country_name ="United States of America"
+GROUP BY date
+
+
+After input the '10' query
+Click "Explore Data" > "Explore with Data Studio"
+Authorize your BigQuery in Data Studio
+Save your Data Studio Explorer
+Get Started > Check "I acknowlegde..." > Accept > Yes to All > Done
+Check Your Progress
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
